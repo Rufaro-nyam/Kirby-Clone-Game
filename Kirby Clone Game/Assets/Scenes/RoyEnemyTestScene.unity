@@ -599,6 +599,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Boomerang enemy
       objectReference: {fileID: 0}
+    - target: {fileID: 7265558808724634198, guid: bccb2c2ec30f9fe468b1491623a5dedc, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8784247312405022718, guid: bccb2c2ec30f9fe468b1491623a5dedc, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.47
@@ -752,6 +756,10 @@ PrefabInstance:
     - target: {fileID: 7485624455823459735, guid: 708d9b060085fbc4a99938bba382b705, type: 3}
       propertyPath: m_Name
       value: FlyingEnemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 7485624455823459735, guid: 708d9b060085fbc4a99938bba382b705, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
