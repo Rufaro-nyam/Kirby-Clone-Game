@@ -6,6 +6,10 @@ public class EnemyDamageDealer : MonoBehaviour
     [Header("Targeting")]
     [SerializeField] private LayerMask playerLayer;
 
+    [Header("Knockback Settings")]
+    [SerializeField] private float knockbackForce = 10f;
+    [SerializeField] private float upwardForce = 4f; // Gives a nice subtle arc away from hit
+
     [Header("Hit Impact Settings")]
     [SerializeField] private GameObject hitEffectPrefab;
     [SerializeField] private float freezeDuration = 0.08f; // Hit stop (~80ms)
@@ -31,11 +35,10 @@ public class EnemyDamageDealer : MonoBehaviour
     {
         if (!canDamage) return;
 
-        // Check if collision object is on the Player layer
         if (((1 << collision.gameObject.layer) & playerLayer) != 0)
         {
             Vector2 hitPoint = collision.contacts[0].point;
-            TriggerHitImpact(hitPoint);
+            ApplyDamageAndImpact(collision.gameObject, hitPoint);
         }
     }
 
@@ -43,40 +46,54 @@ public class EnemyDamageDealer : MonoBehaviour
     {
         if (!canDamage) return;
 
-        // Check if trigger object is on the Player layer
         if (((1 << other.gameObject.layer) & playerLayer) != 0)
         {
             Vector2 hitPoint = other.ClosestPoint(transform.position);
-            TriggerHitImpact(hitPoint);
+            ApplyDamageAndImpact(other.gameObject, hitPoint);
         }
     }
 
-    private void TriggerHitImpact(Vector2 hitPoint)
+    private void ApplyDamageAndImpact(GameObject playerObj, Vector2 hitPoint)
     {
-        // 1. Spawn Impact VFX at contact point
+        // 1. Trigger Knockback through Player Script
+        PlayerMovement2D playerMovement = playerObj.GetComponent<PlayerMovement2D>();
+        if (playerMovement != null)
+        {
+            Vector2 pushDirection = (playerObj.transform.position - transform.position).normalized;
+
+            if (Mathf.Abs(pushDirection.x) < 0.1f)
+            {
+                pushDirection.x = transform.position.x < playerObj.transform.position.x ? 1f : -1f;
+            }
+
+            Vector2 knockbackImpulse = new Vector2(pushDirection.x * knockbackForce, upwardForce);
+
+            // Pass the knockback force AND lockout duration (e.g., 0.2 seconds)
+            playerMovement.ApplyKnockback(knockbackImpulse, 0.2f);
+        }
+
+        // 2. Spawn Impact VFX at contact point
         if (hitEffectPrefab != null)
         {
             Instantiate(hitEffectPrefab, hitPoint, Quaternion.identity);
-            
         }
 
-        // 2. Freeze Frame (Hit Stop)
+        // 3. Freeze Frame (Hit Stop)
         StartCoroutine(FrameFreeze(freezeDuration));
 
-        // 3. Camera Shake
+        // 4. Camera Shake
         if (mainCamera != null)
         {
             StartCoroutine(CameraShake(shakeDuration, shakeMagnitude));
         }
 
-        // 4. Start local damage cooldown so it doesn't trigger every physics tick
+        // 5. Cooldown trigger
         StartCoroutine(CooldownRoutine());
     }
 
     private IEnumerator FrameFreeze(float duration)
     {
         Time.timeScale = 0f;
-        // Uses unscaled time so the yield finishes even though Time.timeScale is 0
         yield return new WaitForSecondsRealtime(duration);
         Time.timeScale = 1f;
     }
@@ -93,7 +110,7 @@ public class EnemyDamageDealer : MonoBehaviour
 
             mainCamera.localPosition = new Vector3(originalCamPos.x + x, originalCamPos.y + y, originalCamPos.z);
 
-            elapsed += Time.unscaledDeltaTime; // Unscaled delta time works during frame freeze!
+            elapsed += Time.unscaledDeltaTime;
             yield return null;
         }
 

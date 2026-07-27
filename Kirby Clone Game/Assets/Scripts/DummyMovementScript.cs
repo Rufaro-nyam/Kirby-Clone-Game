@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -16,7 +17,10 @@ public class PlayerMovement2D : MonoBehaviour
     private float horizontalInput;
     private bool isGrounded;
     private int jumpsRemaining;
-    private const int MAX_JUMPS = 2; // Allows initial jump + 1 extra (double jump)
+    private const int MAX_JUMPS = 2;
+
+    // Track when player is being knocked back
+    private bool isKnockedBack = false;
 
     private void Awake()
     {
@@ -25,20 +29,19 @@ public class PlayerMovement2D : MonoBehaviour
 
     private void Update()
     {
-        // Get horizontal input (A/D, Left/Right Arrows)
+        // Don't take input while locked in knockback
+        if (isKnockedBack) return;
+
         horizontalInput = Input.GetAxisRaw("Horizontal");
 
-        // Check if player is standing on the ground
         bool wasGrounded = isGrounded;
         isGrounded = Physics2D.OverlapCircle(groundCheck.transform.position, groundCheckRadius, groundLayer);
 
-        // Reset jumps when landing
         if (isGrounded && !wasGrounded)
         {
             jumpsRemaining = MAX_JUMPS;
         }
 
-        // Jump Input (Space bar or W / Up Arrow if configured in Input Manager)
         if (Input.GetButtonDown("Jump"))
         {
             TryJump();
@@ -47,7 +50,9 @@ public class PlayerMovement2D : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Apply horizontal velocity (preserves vertical velocity for falling/jumping)
+        // STOP OVERWRITING VELOCITY WHILE KNOCKED BACK!
+        if (isKnockedBack) return;
+
         rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
     }
 
@@ -55,19 +60,38 @@ public class PlayerMovement2D : MonoBehaviour
     {
         if (isGrounded || jumpsRemaining > 0)
         {
-            // Reset vertical velocity before jump so double jump feels crisp
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             jumpsRemaining--;
         }
     }
 
-    // Visual helper to see the ground check circle in the Scene view
+    // --- PUBLIC METHOD CALLED BY DAMAGE SCRIPT ---
+    public void ApplyKnockback(Vector2 force, float duration)
+    {
+        StartCoroutine(KnockbackRoutine(force, duration));
+    }
+
+    private IEnumerator KnockbackRoutine(Vector2 force, float duration)
+    {
+        isKnockedBack = true;
+
+        // Reset velocity so previous movement momentum doesn't counter knockback
+        rb.linearVelocity = Vector2.zero;
+
+        // Apply knockback impulse
+        rb.AddForce(force, ForceMode2D.Impulse);
+
+        // Wait for knockback duration before returning movement control
+        yield return new WaitForSeconds(duration);
+
+        isKnockedBack = false;
+    }
+
     private void OnDrawGizmosSelected()
     {
         if (groundCheck != null)
         {
             Gizmos.color = Color.green;
-            //Gizmos.ra = false;
             Gizmos.DrawWireSphere(groundCheck.transform.position, groundCheckRadius);
         }
     }
