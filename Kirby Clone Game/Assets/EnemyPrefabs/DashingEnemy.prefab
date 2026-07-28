@@ -136,6 +136,7 @@ GameObject:
   - component: {fileID: 3618527541878571391}
   - component: {fileID: 5636356212320215594}
   - component: {fileID: 5255040787346636699}
+  - component: {fileID: 5468777073253988316}
   m_Layer: 0
   m_Name: DashingEnemy
   m_TagString: Untagged
@@ -339,6 +340,25 @@ MonoBehaviour:
   shakeDuration: 0.2
   shakeMagnitude: 0.3
   hitCooldown: 1
+--- !u!114 &5468777073253988316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3933321646265695082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81a1e8e1dd2e8c540978a94654cbe862, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyName: DASHER
+  maxHealth: 100
+  engagementDistance: 6.05
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 262144
+  enemyHudPrefab: {fileID: 7461552984252806966, guid: b70869dbcde0c254787c7cebec45f07b, type: 3}
 --- !u!1 &8370351517234433455
 GameObject:
   m_ObjectHideFlags: 0

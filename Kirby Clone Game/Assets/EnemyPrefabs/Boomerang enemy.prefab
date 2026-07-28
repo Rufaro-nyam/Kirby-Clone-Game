@@ -393,6 +393,7 @@ GameObject:
   - component: {fileID: 6745382175967964707}
   - component: {fileID: 5544485132591722997}
   - component: {fileID: 1763162411787932805}
+  - component: {fileID: 2076202540262214941}
   m_Layer: 0
   m_Name: Boomerang enemy
   m_TagString: Untagged
@@ -570,6 +571,25 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 131072
   attackCooldown: 2.5
+--- !u!114 &2076202540262214941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7265558808724634198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81a1e8e1dd2e8c540978a94654cbe862, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyName: BOOMERANG
+  maxHealth: 100
+  engagementDistance: 7.93
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 262144
+  enemyHudPrefab: {fileID: 7461552984252806966, guid: b70869dbcde0c254787c7cebec45f07b, type: 3}
 --- !u!1 &7638314572886479871
 GameObject:
   m_ObjectHideFlags: 0

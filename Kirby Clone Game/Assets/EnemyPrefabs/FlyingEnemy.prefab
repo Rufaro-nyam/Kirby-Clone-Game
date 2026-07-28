@@ -310,6 +310,7 @@ GameObject:
   - component: {fileID: 7116781091655055371}
   - component: {fileID: 8316177153221633420}
   - component: {fileID: 3446673268077112898}
+  - component: {fileID: 6571887048092897820}
   m_Layer: 0
   m_Name: FlyingEnemy
   m_TagString: Untagged
@@ -500,6 +501,25 @@ MonoBehaviour:
   shakeDuration: 0.2
   shakeMagnitude: 0.3
   hitCooldown: 1
+--- !u!114 &6571887048092897820
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7485624455823459735}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81a1e8e1dd2e8c540978a94654cbe862, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyName: FLYING ENEMY
+  maxHealth: 100
+  engagementDistance: 5.97
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 262144
+  enemyHudPrefab: {fileID: 7461552984252806966, guid: b70869dbcde0c254787c7cebec45f07b, type: 3}
 --- !u!1 &9089662502127757125
 GameObject:
   m_ObjectHideFlags: 0
