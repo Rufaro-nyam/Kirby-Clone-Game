@@ -4,9 +4,9 @@ using UnityEngine;
 public enum CopyAbility
 {
     None,
-    Fire,
-    Spark,
-    Sword
+    Fly,
+    Bow,
+    Dash
 }
 
 public class InhalableEnemy : MonoBehaviour
