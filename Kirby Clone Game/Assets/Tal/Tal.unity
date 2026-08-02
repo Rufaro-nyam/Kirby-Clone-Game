@@ -373,7 +373,7 @@ GameObject:
   - component: {fileID: 562656872}
   - component: {fileID: 562656871}
   - component: {fileID: 562656870}
-  m_Layer: 6
+  m_Layer: 3
   m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -682,7 +682,7 @@ MonoBehaviour:
   inhaleBoxSize: {x: 4, y: 2}
   inhalableLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   inhalePullSpeed: 5
   eatDistance: 0.8
   currentEquippedAbility: 0
@@ -698,7 +698,7 @@ MonoBehaviour:
   groundCheckRadius: 0.2
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
 --- !u!114 &610812166
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -859,7 +859,7 @@ GameObject:
   - component: {fileID: 937138297}
   - component: {fileID: 937138296}
   - component: {fileID: 937138295}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: BowEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1181,7 +1181,7 @@ GameObject:
   - component: {fileID: 1149589227}
   - component: {fileID: 1149589226}
   - component: {fileID: 1149589225}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FlyEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1505,7 +1505,7 @@ GameObject:
   - component: {fileID: 1434128444}
   - component: {fileID: 1434128443}
   - component: {fileID: 1434128446}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: DashEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
