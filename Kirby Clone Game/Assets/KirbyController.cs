@@ -1,231 +1,313 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class KirbyController : MonoBehaviour
 {
-    [Header("Movement Stats")]
-    public float walkSpeed = 5f;
-    public float dashSpeed = 8f;
-    public float jumpForce = 12f;
-    public float highJumpForce = 16f;
-    public float floatFlapForce = 6f;
-    public float slideSpeed = 10f;
-    public float slideDuration = 0.4f;
+    [Header("Movement Settings")]
+    public float walkSpeed = 3f;
+    public float sprintSpeed = 5f;
+    public float jumpForce = 4f;
 
-    [Header("State Flags")]
-    public bool isGrounded = false;
-    public bool isFloating = false;
-    public bool isCrouching = false;
-    public bool isSliding = false;
-    public bool isDashing = false;
+    [Header("Double Tap Settings")]
+    public float doubleTapThreshold = 0.3f;
+
+    [Header("Float Jump Settings")]
+    public int maxFloatJumps = 3;
+    public float floatJumpForce = 4f;
+
+    [Header("Crouch Settings")]
+    public float crouchHeightMultiplier = 0.5f;
+
+    [Header("Spit Settings")]
+    public GameObject airPuffPrefab;
+    public Transform spitSpawnPoint;
+    public float airPuffSpeed = 8f;
+    public float airPuffLifetime = 0.4f;
+
+    [Header("Ground Spit Settings")]
+    public GameObject starProjectilePrefab; // The heavy star he shoots when spitting an enemy
+    public float starProjectileSpeed = 12f;
+
+    [Header("Inhale Settings")]
+    public Transform inhalePoint;
+    public Vector2 inhaleBoxSize = new Vector2(4f, 2f);
+    public LayerMask inhalableLayer;
+    public float inhalePullSpeed = 5f;
+    public float eatDistance = 0.8f;
 
     [Header("Ground Detection")]
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
+    public LayerMask groundLayer;
 
     private Rigidbody2D rb;
+    private float horizontalInput;
+    private float verticalInput;
+    private bool isGrounded;
 
-    // Timers for double taps and holds
-    private float lastRightTapTime;
-    private float lastLeftTapTime;
-    private float lastJumpTapTime;
-    private float doubleTapWindow = 0.25f;
-    private float jumpHoldTime = 0f;
-    private float jumpHoldThreshold = 0.2f; // Time needed to hold for a high jump
-    private float slideTimer = 0f;
+    // --- State Tracking Variables ---
+    private bool isSprinting;
+    private bool isCrouching;
+    private bool isFloating;
+    private float facingDirection = 1f;
+    private float lastTapTime;
+    private float lastTapDirection;
+    private int currentFloatJumps = 0;
 
-    void Start()
+    // --- Mouth & Ability Variables ---
+    private bool isInhaling;
+    private bool hasSomethingInMouth;
+    private CopyAbility currentlyInhaledAbility = CopyAbility.None; // Remembers what is in his mouth
+
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
     }
 
     void Update()
     {
-        CheckGrounded();
-        HandleInputs();
+        if (groundCheck != null)
+        {
+            float checkRadius = isCrouching ? groundCheckRadius + 0.5f : groundCheckRadius;
+            isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
+
+            if (isGrounded)
+            {
+                currentFloatJumps = 0;
+                isFloating = false;
+            }
+        }
+
+        // --- SWALLOW & CROUCH LOGIC ---
+        // Holding down triggers a swallow if mouth is full, or a crouch if empty
+        if (verticalInput < -0.5f && isGrounded)
+        {
+            if (hasSomethingInMouth)
+            {
+                Swallow();
+            }
+            else if (!isInhaling)
+            {
+                isCrouching = true;
+            }
+        }
+        else
+        {
+            isCrouching = false; // Stop crouching when let go
+        }
+
+        Vector3 currentScale = transform.localScale;
+        currentScale.y = isCrouching ? crouchHeightMultiplier : 1f;
+        currentScale.x = hasSomethingInMouth ? 1.3f : 1f;
+        transform.localScale = currentScale;
+
+        if (isInhaling)
+        {
+            ProcessInhaleSuction();
+        }
     }
 
-    private void CheckGrounded()
+    // --- INPUT MESSAGES ---
+
+    void OnMove(InputValue value)
     {
-        // Simple tag-based collision check using OverlapCircle (create an empty GameObject at Kirby's feet and assign it to groundCheck)
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(groundCheck.position, groundCheckRadius);
-        isGrounded = false;
-        foreach (Collider2D col in colliders)
+        Vector2 input = value.Get<Vector2>();
+        horizontalInput = input.x;
+        verticalInput = input.y;
+
+        if (horizontalInput != 0 && !isCrouching && !isInhaling)
         {
-            if (col.CompareTag("Ground"))
+            float currentDirection = Mathf.Sign(horizontalInput);
+            facingDirection = currentDirection;
+
+            if (!hasSomethingInMouth && Time.time - lastTapTime <= doubleTapThreshold && currentDirection == lastTapDirection)
             {
-                isGrounded = true;
-                if (isFloating) ExitFloat(); // Landing cancels float
+                isSprinting = true;
+            }
+            else
+            {
+                isSprinting = false;
+            }
+
+            lastTapTime = Time.time;
+            lastTapDirection = currentDirection;
+        }
+        else
+        {
+            isSprinting = false;
+        }
+    }
+
+    void OnJump(InputValue value)
+    {
+        if (value.isPressed && !isCrouching && !isInhaling)
+        {
+            if (isGrounded)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            }
+            else if (currentFloatJumps < maxFloatJumps && !hasSomethingInMouth)
+            {
+                rb.linearVelocity = new Vector2(rb.linearVelocity.x, floatJumpForce);
+                currentFloatJumps++;
+                isFloating = true;
+            }
+        }
+    }
+
+    void OnPrimaryAction(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            // 1. FLOAT SPIT
+            if (isFloating && !hasSomethingInMouth)
+            {
+                isFloating = false;
+                currentFloatJumps = maxFloatJumps;
+
+                if (airPuffPrefab != null)
+                {
+                    Vector3 spawnPos = spitSpawnPoint != null ? spitSpawnPoint.position : transform.position;
+                    GameObject puff = Instantiate(airPuffPrefab, spawnPos, Quaternion.identity);
+
+                    Rigidbody2D puffRb = puff.GetComponent<Rigidbody2D>();
+                    if (puffRb != null)
+                    {
+                        puffRb.linearVelocity = new Vector2(facingDirection * airPuffSpeed, 0f);
+                    }
+                    Destroy(puff, airPuffLifetime);
+                }
+            }
+            // 2. GROUND SPIT (Shoot the star!)
+            else if (hasSomethingInMouth)
+            {
+                GroundSpit();
+            }
+            // 3. INHALE
+            else if (isGrounded && !isCrouching)
+            {
+                isInhaling = true;
+            }
+        }
+        else
+        {
+            isInhaling = false;
+        }
+    }
+
+    // --- ABILITY LOGIC ---
+
+    void ProcessInhaleSuction()
+    {
+        Vector2 boxCenter = (Vector2)inhalePoint.position + new Vector2(facingDirection * (inhaleBoxSize.x / 2f), 0);
+        Collider2D[] objectsToSuck = Physics2D.OverlapBoxAll(boxCenter, inhaleBoxSize, 0f, inhalableLayer);
+
+        foreach (Collider2D obj in objectsToSuck)
+        {
+            obj.transform.position = Vector3.MoveTowards(obj.transform.position, inhalePoint.position, inhalePullSpeed * Time.deltaTime);
+
+            if (Vector2.Distance(obj.transform.position, inhalePoint.position) < eatDistance)
+            {
+                // Check if the enemy has a copy ability script before we destroy it
+                InhalableEnemy enemyData = obj.GetComponent<InhalableEnemy>();
+                if (enemyData != null)
+                {
+                    currentlyInhaledAbility = enemyData.abilityType; // Save the ability!
+                }
+                else
+                {
+                    currentlyInhaledAbility = CopyAbility.None; // Normal enemy
+                }
+
+                Destroy(obj.gameObject);
+                hasSomethingInMouth = true;
+                isInhaling = false;
                 break;
             }
         }
     }
 
-    private void HandleInputs()
+    void Swallow()
     {
-        // 9) Crouch & 10) Slide
-        if (isGrounded && !isFloating)
-        {
-            if (Input.GetKey(KeyCode.DownArrow))
-            {
-                isCrouching = true;
-                isDashing = false; // Crouching cancels dash
+        hasSomethingInMouth = false;
 
-                if (Input.GetKeyDown(KeyCode.X) && !isSliding) // Assuming 'B' button is mapped to X
-                {
-                    StartSlide();
-                }
-            }
-            else
-            {
-                isCrouching = false;
-            }
+        // This is where we will trigger the actual ability change later!
+        if (currentlyInhaledAbility != CopyAbility.None)
+        {
+            Debug.Log($"SWALLOWED! Kirby gained the {currentlyInhaledAbility} ability!");
+            // TODO: Equip ability logic goes here
+        }
+        else
+        {
+            Debug.Log("Swallowed a normal enemy. Yummy!");
         }
 
-        if (isSliding)
+        // Reset the tracked ability so his mouth is completely empty
+        currentlyInhaledAbility = CopyAbility.None;
+    }
+
+    void GroundSpit()
+    {
+        hasSomethingInMouth = false;
+        currentlyInhaledAbility = CopyAbility.None; // We spit it out, so we lose the ability chance
+
+        if (starProjectilePrefab != null)
         {
-            HandleSlideTimer();
-            return; // Lock out other inputs while sliding
-        }
+            Vector3 spawnPos = spitSpawnPoint != null ? spitSpawnPoint.position : transform.position;
+            GameObject star = Instantiate(starProjectilePrefab, spawnPos, Quaternion.identity);
 
-        // 1) Walk & 2) Dash (Double Tap detection)
-        HandleHorizontalMovement();
+            Rigidbody2D starRb = star.GetComponent<Rigidbody2D>();
+            if (starRb != null)
+            {
+                starRb.linearVelocity = new Vector2(facingDirection * starProjectileSpeed, 0f);
+            }
 
-        // 3), 4), 5), 6), 7) Jump and Float Logic
-        HandleJumpAndFloat();
-
-        // 8) Float Spit
-        if (isFloating && Input.GetKeyDown(KeyCode.X)) // 'B' Button
-        {
-            FloatSpit();
+            // Destroy the star after 2 seconds so it doesn't fly forever
+            Destroy(star, 2f);
         }
     }
 
-    private void HandleHorizontalMovement()
+    // --- PHYSICS MOVEMENT ---
+
+    void FixedUpdate()
     {
-        if (isCrouching)
+        if (isCrouching || isInhaling)
         {
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-            return;
         }
-
-        // Double tap logic for Left/Right
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        else
         {
-            if (Time.time - lastRightTapTime < doubleTapWindow) isDashing = true;
-            lastRightTapTime = Time.time;
-        }
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            if (Time.time - lastLeftTapTime < doubleTapWindow) isDashing = true;
-            lastLeftTapTime = Time.time;
-        }
+            float currentSpeed = walkSpeed;
 
-        // Stop dashing if we stop pressing the direction
-        if (Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow))
-        {
-            isDashing = false;
-        }
-
-        float horizontalInput = Input.GetAxisRaw("Horizontal");
-        float currentSpeed = isDashing ? dashSpeed : walkSpeed;
-
-        // Apply movement (allow air movement but at normal speed if floating)
-        if (isFloating) currentSpeed = walkSpeed;
-
-        rb.linearVelocity = new Vector2(horizontalInput * currentSpeed, rb.linearVelocity.y);
-    }
-
-    private void HandleJumpAndFloat()
-    {
-        bool jumpPressed = Input.GetKeyDown(KeyCode.Z); // 'A' button
-        bool jumpHeld = Input.GetKey(KeyCode.Z);
-        bool jumpReleased = Input.GetKeyUp(KeyCode.Z);
-        bool upPressed = Input.GetKeyDown(KeyCode.UpArrow);
-        bool upHeld = Input.GetKey(KeyCode.UpArrow);
-
-        // Track how long jump is held for High Jump (4)
-        if (jumpHeld && !isFloating && isGrounded)
-        {
-            jumpHoldTime += Time.deltaTime;
-        }
-
-        // 3) Regular Jump & 4) High Jump (Triggered on release or threshold met)
-        if (jumpReleased && isGrounded && !isFloating)
-        {
-            float applyForce = (jumpHoldTime >= jumpHoldThreshold) ? highJumpForce : jumpForce;
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, applyForce);
-            jumpHoldTime = 0f;
-        }
-
-        // 5) Enter Float
-        if (!isGrounded && !isFloating)
-        {
-            // Enter float on double tap 'A' in air, or holding UP
-            if (jumpPressed)
+            if (hasSomethingInMouth)
             {
-                if (Time.time - lastJumpTapTime < doubleTapWindow) EnterFloat();
-                lastJumpTapTime = Time.time;
+                currentSpeed = walkSpeed / 2f;
             }
-            else if (upHeld)
+            else if (isSprinting)
             {
-                EnterFloat();
+                currentSpeed = sprintSpeed;
             }
-        }
 
-        // 6) Single Float Jump & 7) Infinite Float Jump
-        if (isFloating)
-        {
-            // Tap to flap, hold to keep going up
-            if (jumpPressed || upPressed || jumpHeld || upHeld)
-            {
-                // Give a slight upward boost
-                rb.linearVelocity = new Vector2(rb.linearVelocity.x, floatFlapForce);
-            }
+            rb.linearVelocity = new Vector2(horizontalInput * currentSpeed, rb.linearVelocity.y);
         }
     }
 
-    private void EnterFloat()
+    private void OnDrawGizmosSelected()
     {
-        isFloating = true;
-        isDashing = false;
-        rb.gravityScale = 0.5f; // Kirby falls slower while floating
-
-        // Initial puff upward
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, floatFlapForce);
-    }
-
-    private void ExitFloat()
-    {
-        isFloating = false;
-        rb.gravityScale = 1f; // Return to normal gravity
-    }
-
-    private void FloatSpit()
-    {
-        // TODO: Instantiate star projectile here
-        Debug.Log("Float Spit!");
-        ExitFloat();
-    }
-
-    private void StartSlide()
-    {
-        isSliding = true;
-        slideTimer = slideDuration;
-
-        // Determine direction based on facing (simplification: using input or velocity)
-        float direction = Input.GetAxisRaw("Horizontal");
-        if (direction == 0) direction = 1; // Default to right if no input
-
-        rb.linearVelocity = new Vector2(direction * slideSpeed, rb.linearVelocity.y);
-    }
-
-    private void HandleSlideTimer()
-    {
-        slideTimer -= Time.deltaTime;
-        if (slideTimer <= 0)
+        if (groundCheck != null)
         {
-            isSliding = false;
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+        }
+
+        if (inhalePoint != null)
+        {
+            Gizmos.color = Color.yellow;
+            float facing = Application.isPlaying ? facingDirection : 1f;
+            Vector2 boxCenter = (Vector2)inhalePoint.position + new Vector2(facing * (inhaleBoxSize.x / 2f), 0);
+            Gizmos.DrawWireCube(boxCenter, inhaleBoxSize);
         }
     }
 }
