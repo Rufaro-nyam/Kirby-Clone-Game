@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 343025408268947990}
   - component: {fileID: 6446434074889177208}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Square (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96,7 +96,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1964063294700753413}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: face
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -137,13 +137,14 @@ GameObject:
   - component: {fileID: 5636356212320215594}
   - component: {fileID: 5255040787346636699}
   - component: {fileID: 5468777073253988316}
-  m_Layer: 0
+  - component: {fileID: 1865158332961701552}
+  m_Layer: 7
   m_Name: DashingEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &7890370098816793834
 Transform:
   m_ObjectHideFlags: 0
@@ -302,17 +303,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   graphicsTransform: {fileID: 7689763266047323999}
   faceTransform: {fileID: 1964063294700753413}
-  patrolDistance: 4
+  patrolDistance: 5.65
   patrolSpeed: 3
   pauseAtEndpoints: 1
   detectionRange: 6
   detectionHeight: 1.5
   playerLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   telegraphDuration: 0.6
   expandedScale: {x: 1.3, y: 1.3, z: 1}
   dashSpeed: 18
@@ -332,7 +333,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   knockbackForce: 20
   upwardForce: 200
   hitEffectPrefab: {fileID: 3042519775331041172, guid: 841004c4c6a39e244abe2257394de913, type: 3}
@@ -354,11 +355,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyName: DASHER
   maxHealth: 100
-  engagementDistance: 6.05
+  engagementDistance: 5.01
   playerLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   enemyHudPrefab: {fileID: 7461552984252806966, guid: b70869dbcde0c254787c7cebec45f07b, type: 3}
+--- !u!114 &1865158332961701552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3933321646265695082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 028715ec7ccb2bb46b424852e2b6c26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  abilityType: 3
 --- !u!1 &8370351517234433455
 GameObject:
   m_ObjectHideFlags: 0
@@ -369,7 +383,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1894252133641522757}
   - component: {fileID: 4296059279322865038}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Square (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -456,7 +470,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7451549989911992942}
   - component: {fileID: 9012039239030184622}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Square
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -543,7 +557,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7689763266047323999}
   - component: {fileID: 3324951323574069854}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Square
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -631,7 +645,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7037030243446219901}
   - component: {fileID: 1984853269591749767}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Square (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -717,7 +731,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6029522571571873756}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: GFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}

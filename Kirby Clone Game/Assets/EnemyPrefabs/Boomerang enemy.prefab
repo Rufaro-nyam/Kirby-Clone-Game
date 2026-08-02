@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4945319009812928829}
   - component: {fileID: 7829583310011269410}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Square (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96,7 +96,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6694079292625808774}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ThrowPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -128,7 +128,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4685674751959417774}
   - component: {fileID: 1831608534955156848}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Square
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -216,7 +216,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5760072593385200232}
   - component: {fileID: 8266870270702697458}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Square
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -303,7 +303,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5383782068059243681}
   - component: {fileID: 2665223967883354562}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Square (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -394,7 +394,8 @@ GameObject:
   - component: {fileID: 5544485132591722997}
   - component: {fileID: 1763162411787932805}
   - component: {fileID: 2076202540262214941}
-  m_Layer: 0
+  - component: {fileID: 8182407314505826184}
+  m_Layer: 7
   m_Name: Boomerang enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -566,10 +567,10 @@ MonoBehaviour:
   detectionDistance: 8
   playerLayer:
     serializedVersion: 2
-    m_Bits: 262144
+    m_Bits: 64
   groundLayer:
     serializedVersion: 2
-    m_Bits: 131072
+    m_Bits: 8
   attackCooldown: 2.5
 --- !u!114 &2076202540262214941
 MonoBehaviour:
@@ -588,8 +589,21 @@ MonoBehaviour:
   engagementDistance: 7.93
   playerLayer:
     serializedVersion: 2
-    m_Bits: 262144
+    m_Bits: 64
   enemyHudPrefab: {fileID: 7461552984252806966, guid: b70869dbcde0c254787c7cebec45f07b, type: 3}
+--- !u!114 &8182407314505826184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7265558808724634198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 028715ec7ccb2bb46b424852e2b6c26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  abilityType: 2
 --- !u!1 &7638314572886479871
 GameObject:
   m_ObjectHideFlags: 0
@@ -599,7 +613,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3445176137795363101}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: face
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -633,7 +647,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1004580587195946367}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: GFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -664,6 +678,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8784247312405022718}
     m_Modifications:
+    - target: {fileID: 2640857912852470585, guid: ed53772f94568e746b14c56e6e4faed5, type: 3}
+      propertyPath: playerLayer.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4928820335547379565, guid: ed53772f94568e746b14c56e6e4faed5, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.77
@@ -707,6 +725,14 @@ PrefabInstance:
     - target: {fileID: 8723853349343861148, guid: ed53772f94568e746b14c56e6e4faed5, type: 3}
       propertyPath: m_Name
       value: Boomerang
+      objectReference: {fileID: 0}
+    - target: {fileID: 8723853349343861148, guid: ed53772f94568e746b14c56e6e4faed5, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8723853349343861148, guid: ed53772f94568e746b14c56e6e4faed5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

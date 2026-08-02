@@ -104,7 +104,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerLayer:
     serializedVersion: 2
-    m_Bits: 262144
+    m_Bits: 64
   knockbackForce: 200
   upwardForce: 200
   hitEffectPrefab: {fileID: 3042519775331041172, guid: 841004c4c6a39e244abe2257394de913, type: 3}

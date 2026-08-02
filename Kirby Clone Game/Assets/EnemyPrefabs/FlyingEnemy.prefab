@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4076012672952809000}
   - component: {fileID: 3320562925357480155}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Square
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7272197307295667441}
   - component: {fileID: 8381334641383165422}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Square (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -184,7 +184,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6274343520212919461}
   - component: {fileID: 4287684293118930616}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Square (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -270,7 +270,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6327113693227736259}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: GFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -311,7 +311,8 @@ GameObject:
   - component: {fileID: 8316177153221633420}
   - component: {fileID: 3446673268077112898}
   - component: {fileID: 6571887048092897820}
-  m_Layer: 0
+  - component: {fileID: 9064698358813799511}
+  m_Layer: 7
   m_Name: FlyingEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -467,10 +468,10 @@ MonoBehaviour:
   detectionRadius: 6
   playerLayer:
     serializedVersion: 2
-    m_Bits: 262144
+    m_Bits: 64
   groundLayer:
     serializedVersion: 2
-    m_Bits: 131072
+    m_Bits: 8
   hoverDistance: 0.5
   hoverSpeed: 2
   minGroundClearance: 0.8
@@ -493,7 +494,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerLayer:
     serializedVersion: 2
-    m_Bits: 262144
+    m_Bits: 64
   knockbackForce: 200
   upwardForce: 200
   hitEffectPrefab: {fileID: 3042519775331041172, guid: 841004c4c6a39e244abe2257394de913, type: 3}
@@ -518,8 +519,21 @@ MonoBehaviour:
   engagementDistance: 5.97
   playerLayer:
     serializedVersion: 2
-    m_Bits: 262144
+    m_Bits: 64
   enemyHudPrefab: {fileID: 7461552984252806966, guid: b70869dbcde0c254787c7cebec45f07b, type: 3}
+--- !u!114 &9064698358813799511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7485624455823459735}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 028715ec7ccb2bb46b424852e2b6c26f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  abilityType: 1
 --- !u!1 &9089662502127757125
 GameObject:
   m_ObjectHideFlags: 0
@@ -530,7 +544,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4145372209986887825}
   - component: {fileID: 1137447344700973478}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Square (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
