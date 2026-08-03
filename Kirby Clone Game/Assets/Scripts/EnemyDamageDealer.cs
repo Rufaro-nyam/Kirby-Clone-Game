@@ -95,7 +95,7 @@ public class EnemyDamageDealer : MonoBehaviour
         }
 
         // 5. Freeze Frame (Hit Stop)
-        StartCoroutine(FrameFreeze(freezeDuration));
+        //StartCoroutine(FrameFreeze(freezeDuration));
 
         // 6. Camera Shake
         if (mainCamera != null)
@@ -107,12 +107,13 @@ public class EnemyDamageDealer : MonoBehaviour
         StartCoroutine(CooldownRoutine());
     }
 
-    private IEnumerator FrameFreeze(float duration)
-    {
-        Time.timeScale = 0f;
-        yield return new WaitForSecondsRealtime(duration);
-        Time.timeScale = 1f;
-    }
+      private IEnumerator FrameFreeze(float duration)
+      {
+          Time.timeScale = 0f;
+          yield return new WaitForSecondsRealtime(duration);
+          Time.timeScale = 1f;
+      }
+    
 
     private IEnumerator CameraShake(float duration, float magnitude)
     {

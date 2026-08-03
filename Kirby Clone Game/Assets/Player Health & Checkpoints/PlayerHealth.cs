@@ -18,12 +18,14 @@ public class PlayerHealth : MonoBehaviour
 
     private Vector2 initialSpawnPosition;
     private Rigidbody2D rb;
+    private KirbyController kirbyController; // Added reference to KirbyController
 
     private void Awake()
     {
         currentHealth = maxHealth;
         initialSpawnPosition = transform.position;
         rb = GetComponent<Rigidbody2D>();
+        kirbyController = GetComponent<KirbyController>(); // Get the controller on awake
         UpdateUI();
     }
 
@@ -35,6 +37,14 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = Mathf.Max(currentHealth, 0);
 
         UpdateUI();
+
+        // --- LOSE ABILITY LOGIC ---
+        // If Kirby has an ability, revert him to normal when taking damage
+        if (kirbyController != null && kirbyController.currentEquippedAbility != CopyAbility.None)
+        {
+            kirbyController.currentEquippedAbility = CopyAbility.None;
+            Debug.Log("Kirby took damage and lost his ability!");
+        }
 
         if (currentHealth <= 0)
         {
@@ -62,6 +72,12 @@ public class PlayerHealth : MonoBehaviour
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero;
+        }
+
+        // Reset ability on death too, just in case
+        if (kirbyController != null)
+        {
+            kirbyController.currentEquippedAbility = CopyAbility.None;
         }
 
         // 3. Teleport to Checkpoint (or initial spawn position if no checkpoint hit yet)
@@ -116,5 +132,37 @@ public class PlayerHealth : MonoBehaviour
     public bool IsInvincible()
     {
         return isInvincible;
+    }
+
+    // Call this when starting a dash
+    public void TriggerDashInvincibility(float duration)
+    {
+        StartCoroutine(DashInvincibilityRoutine(duration));
+    }
+
+    private IEnumerator DashInvincibilityRoutine(float duration)
+    {
+        isInvincible = true;
+
+        float elapsed = 0f;
+        float flashInterval = 0.05f; // Fast flashing for high speed dash
+
+        while (elapsed < duration)
+        {
+            if (playerSprite != null)
+            {
+                playerSprite.enabled = !playerSprite.enabled;
+            }
+            yield return new WaitForSeconds(flashInterval);
+            elapsed += flashInterval;
+        }
+
+        // Ensure sprite is restored and invincibility is turned off
+        if (playerSprite != null)
+        {
+            playerSprite.enabled = true;
+        }
+
+        isInvincible = false;
     }
 }

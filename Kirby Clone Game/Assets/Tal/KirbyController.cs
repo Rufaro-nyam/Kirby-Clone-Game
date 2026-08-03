@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class KirbyController : MonoBehaviour
@@ -35,6 +36,9 @@ public class KirbyController : MonoBehaviour
     public LayerMask inhalableLayer;
     public float inhalePullSpeed = 5f;
     public float eatDistance = 0.8f;
+
+    [Header("Ability UI Settings")]
+    public TextMeshProUGUI abilityUIText;
 
     [Header("Copy Abilities")]
     public CopyAbility currentEquippedAbility = CopyAbility.None;
@@ -229,6 +233,12 @@ public class KirbyController : MonoBehaviour
                     isDashing = true;
                     dashTimeLeft = dashDuration;
                     nextDashTime = Time.time + dashCooldown;
+
+                    PlayerHealth health = GetComponent<PlayerHealth>();
+                    if (health != null)
+                    {
+                        health.TriggerDashInvincibility(dashDuration);
+                    }
                 }
                 return;
             }
@@ -341,6 +351,7 @@ public class KirbyController : MonoBehaviour
         {
             currentEquippedAbility = currentlyInhaledAbility;
             Debug.Log($"Kirby equipped: {currentEquippedAbility}!");
+            abilityUIText.text = currentEquippedAbility.ToString();
         }
 
         currentlyInhaledAbility = CopyAbility.None;
@@ -407,6 +418,40 @@ public class KirbyController : MonoBehaviour
             }
 
             rb.linearVelocity = new Vector2(horizontalInput * currentSpeed, rb.linearVelocity.y);
+        }
+    }
+
+    // --- COMBAT & COLLISION LOGIC ---
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        HandleEnemyContact(collision.gameObject);
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        HandleEnemyContact(other.gameObject);
+    }
+
+    private void HandleEnemyContact(GameObject touchedObject)
+    {
+        // Check if the object we touched is an enemy
+        InhalableEnemy enemy = touchedObject.GetComponent<InhalableEnemy>();
+
+        if (enemy != null)
+        {
+            if (isDashing)
+            {
+                // Kirby is invincible and lethal during a dash!
+                Debug.Log("Dash Attack! Enemy destroyed.");
+                Destroy(touchedObject);
+            }
+            else if (!isInhaling)
+            {
+                // Kirby is NOT dashing. 
+                // This is where we will eventually make Kirby take damage or get knocked back!
+                Debug.Log("Kirby got hurt!");
+            }
         }
     }
 }
