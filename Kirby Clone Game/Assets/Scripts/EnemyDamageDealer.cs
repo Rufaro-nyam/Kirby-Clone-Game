@@ -3,8 +3,9 @@ using UnityEngine;
 
 public class EnemyDamageDealer : MonoBehaviour
 {
-    [Header("Targeting")]
+    [Header("Targeting & Damage")]
     [SerializeField] private LayerMask playerLayer;
+    [SerializeField] private int damageAmount = 1; // Configurable per enemy/projectile
 
     [Header("Knockback Settings")]
     [SerializeField] private float knockbackForce = 10f;
@@ -55,7 +56,22 @@ public class EnemyDamageDealer : MonoBehaviour
 
     private void ApplyDamageAndImpact(GameObject playerObj, Vector2 hitPoint)
     {
-        // 1. Trigger Knockback through Player Script
+        // 1. Check Player Health Component
+        PlayerHealth playerHealth = playerObj.GetComponent<PlayerHealth>();
+
+        // If player is invincible from a previous hit, exit early
+        if (playerHealth != null && playerHealth.IsInvincible())
+        {
+            return;
+        }
+
+        // 2. Deal Damage
+        if (playerHealth != null)
+        {
+            playerHealth.TakeDamage(damageAmount);
+        }
+
+        // 3. Trigger Knockback through Player Script
         PlayerMovement2D playerMovement = playerObj.GetComponent<PlayerMovement2D>();
         if (playerMovement != null)
         {
@@ -68,26 +84,26 @@ public class EnemyDamageDealer : MonoBehaviour
 
             Vector2 knockbackImpulse = new Vector2(pushDirection.x * knockbackForce, upwardForce);
 
-            // Pass the knockback force AND lockout duration (e.g., 0.2 seconds)
+            // Pass the knockback force AND lockout duration (0.2s)
             playerMovement.ApplyKnockback(knockbackImpulse, 0.2f);
         }
 
-        // 2. Spawn Impact VFX at contact point
+        // 4. Spawn Impact VFX at contact point
         if (hitEffectPrefab != null)
         {
             Instantiate(hitEffectPrefab, hitPoint, Quaternion.identity);
         }
 
-        // 3. Freeze Frame (Hit Stop)
+        // 5. Freeze Frame (Hit Stop)
         StartCoroutine(FrameFreeze(freezeDuration));
 
-        // 4. Camera Shake
+        // 6. Camera Shake
         if (mainCamera != null)
         {
             StartCoroutine(CameraShake(shakeDuration, shakeMagnitude));
         }
 
-        // 5. Cooldown trigger
+        // 7. Cooldown trigger
         StartCoroutine(CooldownRoutine());
     }
 
