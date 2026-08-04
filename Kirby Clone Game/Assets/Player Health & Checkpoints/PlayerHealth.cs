@@ -31,7 +31,11 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(int damageAmount = 1)
     {
-        if (isInvincible || currentHealth <= 0) return;
+        // 1. Check if we should block damage (i-frames, dead, or INHALING)
+        if (isInvincible || currentHealth <= 0 || (kirbyController != null && kirbyController.IsInhaling))
+        {
+            return;
+        }
 
         currentHealth -= damageAmount;
         currentHealth = Mathf.Max(currentHealth, 0);
@@ -39,10 +43,11 @@ public class PlayerHealth : MonoBehaviour
         UpdateUI();
 
         // --- LOSE ABILITY LOGIC ---
-        // If Kirby has an ability, revert him to normal when taking damage
         if (kirbyController != null && kirbyController.currentEquippedAbility != CopyAbility.None)
         {
             kirbyController.currentEquippedAbility = CopyAbility.None;
+            kirbyController.abilityUIText.text = "None";
+            kirbyController.abilityUISprite.sprite = kirbyController.noneIMG;
             Debug.Log("Kirby took damage and lost his ability!");
         }
 
@@ -78,6 +83,8 @@ public class PlayerHealth : MonoBehaviour
         if (kirbyController != null)
         {
             kirbyController.currentEquippedAbility = CopyAbility.None;
+            kirbyController.abilityUIText.text = "None";
+            kirbyController.abilityUISprite.sprite = kirbyController.noneIMG;
         }
 
         // 3. Teleport to Checkpoint (or initial spawn position if no checkpoint hit yet)

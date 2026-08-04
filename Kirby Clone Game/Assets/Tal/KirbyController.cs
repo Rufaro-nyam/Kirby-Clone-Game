@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class KirbyController : MonoBehaviour
@@ -9,6 +10,7 @@ public class KirbyController : MonoBehaviour
     public float walkSpeed = 3f;
     public float sprintSpeed = 5f;
     public float jumpForce = 4f;
+    public GameObject appearanceParent;
 
     [Header("Double Tap Settings")]
     public float doubleTapThreshold = 0.3f;
@@ -36,9 +38,15 @@ public class KirbyController : MonoBehaviour
     public LayerMask inhalableLayer;
     public float inhalePullSpeed = 5f;
     public float eatDistance = 0.8f;
+    public GameObject inhaleWindVisual;
 
     [Header("Ability UI Settings")]
     public TextMeshProUGUI abilityUIText;
+    public Image abilityUISprite;
+    public Sprite flyIMG;
+    public Sprite bowIMG;
+    public Sprite dashIMG;
+    public Sprite noneIMG;
 
     [Header("Copy Abilities")]
     public CopyAbility currentEquippedAbility = CopyAbility.None;
@@ -59,6 +67,7 @@ public class KirbyController : MonoBehaviour
     public Transform groundCheck;
     public float groundCheckRadius = 0.2f;
     public LayerMask groundLayer;
+    
 
     private Rigidbody2D rb;
     private float horizontalInput;
@@ -88,6 +97,8 @@ public class KirbyController : MonoBehaviour
     private bool hasSomethingInMouth;
     private CopyAbility currentlyInhaledAbility = CopyAbility.None;
 
+    public bool IsInhaling => isInhaling;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -112,6 +123,17 @@ public class KirbyController : MonoBehaviour
                     isCupidFlying = false;
                     rb.gravityScale = defaultGravity;
                 }
+            }
+
+            if (isInhaling)
+            {
+                ProcessInhaleSuction();
+            }
+
+            // Toggle wind visual on when inhaling, off when not
+            if (inhaleWindVisual != null)
+            {
+                inhaleWindVisual.SetActive(isInhaling);
             }
         }
 
@@ -148,6 +170,11 @@ public class KirbyController : MonoBehaviour
         Vector2 input = value.Get<Vector2>();
         horizontalInput = input.x;
         verticalInput = input.y;
+
+        if (horizontalInput != 0)
+        {
+            appearanceParent.transform.rotation = Quaternion.Euler(0, horizontalInput > 0 ? 0 : 180, 0);
+        }
 
         // Stop flipping facing direction visually if charging the bow or dashing
         if (horizontalInput != 0 && !isCrouching && !isInhaling && !isChargingBow && !isDashing)
@@ -352,6 +379,25 @@ public class KirbyController : MonoBehaviour
             currentEquippedAbility = currentlyInhaledAbility;
             Debug.Log($"Kirby equipped: {currentEquippedAbility}!");
             abilityUIText.text = currentEquippedAbility.ToString();
+            switch (currentEquippedAbility)
+            {
+                case CopyAbility.Fly:
+                    abilityUISprite.sprite = flyIMG;
+                    break;
+
+                case CopyAbility.Bow:
+                    abilityUISprite.sprite = bowIMG;
+                    break;
+
+                case CopyAbility.Dash:
+                    abilityUISprite.sprite = dashIMG;
+                    break;
+
+                case CopyAbility.None:
+                    abilityUISprite.sprite = noneIMG;
+                    break;
+            }
+
         }
 
         currentlyInhaledAbility = CopyAbility.None;
