@@ -10,7 +10,19 @@ public class KirbyController : MonoBehaviour
     public float walkSpeed = 3f;
     public float sprintSpeed = 5f;
     public float jumpForce = 4f;
-    public GameObject appearanceParent;
+    
+
+    [Header("Kirby Sprites")]
+    public SpriteRenderer kirbySpriteRenderer;
+    public Sprite idleSprite;
+    public Sprite jumpSprite;
+    public Sprite floatSprite;
+    public Sprite inhaleSprite;
+    public Sprite fullSprite;
+    public Sprite crouchSprite;
+    public Sprite flySprite;
+    public Sprite bowSprite;
+    public Sprite dashSprite;
 
     [Header("Double Tap Settings")]
     public float doubleTapThreshold = 0.3f;
@@ -135,6 +147,8 @@ public class KirbyController : MonoBehaviour
             {
                 inhaleWindVisual.SetActive(isInhaling);
             }
+
+            UpdateAppearance();
         }
 
         // Prevent crouching if charging the bow or dashing
@@ -170,11 +184,6 @@ public class KirbyController : MonoBehaviour
         Vector2 input = value.Get<Vector2>();
         horizontalInput = input.x;
         verticalInput = input.y;
-
-        if (horizontalInput != 0)
-        {
-            appearanceParent.transform.rotation = Quaternion.Euler(0, horizontalInput > 0 ? 0 : 180, 0);
-        }
 
         // Stop flipping facing direction visually if charging the bow or dashing
         if (horizontalInput != 0 && !isCrouching && !isInhaling && !isChargingBow && !isDashing)
@@ -467,6 +476,64 @@ public class KirbyController : MonoBehaviour
         }
     }
 
+    private void UpdateAppearance()
+    {
+        if (kirbySpriteRenderer == null) return;
+
+        // --- FLIP SPRITE BASED ON FACING DIRECTION ---
+        // Change 'horizontalInput' to match whatever variable name you use for left/right movement input
+        if (horizontalInput > 0.01f)
+        {
+            kirbySpriteRenderer.flipX = false; // Right (Default)
+        }
+        else if (horizontalInput < -0.01f)
+        {
+            kirbySpriteRenderer.flipX = true;  // Left
+        }
+
+        // --- SPRITE SELECTION (Existing Code) ---
+        // 1. Mouth states override everything
+        if (isInhaling)
+        {
+            kirbySpriteRenderer.sprite = inhaleSprite;
+        }
+        else if (hasSomethingInMouth)
+        {
+            kirbySpriteRenderer.sprite = fullSprite;
+        }
+        // 2. Active Ability States
+        else if (isDashing)
+        {
+            kirbySpriteRenderer.sprite = dashSprite;
+        }
+        else if (isChargingBow)
+        {
+            kirbySpriteRenderer.sprite = bowSprite;
+        }
+        else if (isCupidFlying)
+        {
+            kirbySpriteRenderer.sprite = flySprite;
+        }
+        // 3. Standard Movement States
+        else if (isCrouching)
+        {
+            kirbySpriteRenderer.sprite = crouchSprite;
+        }
+        else if (isFloating)
+        {
+            kirbySpriteRenderer.sprite = floatSprite;
+        }
+        else if (!isGrounded && rb.linearVelocity.y > 0.1f)
+        {
+            kirbySpriteRenderer.sprite = jumpSprite;
+        }
+        // 4. Default Fallback
+        else
+        {
+            kirbySpriteRenderer.sprite = idleSprite;
+        }
+    }
+
     // --- COMBAT & COLLISION LOGIC ---
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -499,5 +566,28 @@ public class KirbyController : MonoBehaviour
                 Debug.Log("Kirby got hurt!");
             }
         }
+    }
+
+    public void LoseAbility()
+    {
+        // 1. Reset the Enum and UI
+        currentEquippedAbility = CopyAbility.None;
+        abilityUIText.text = "None";
+        abilityUISprite.sprite = noneIMG;
+
+        // 2. Reset any active ability states
+        if (isCupidFlying)
+        {
+            isCupidFlying = false;
+            rb.gravityScale = defaultGravity; // Give him his gravity back!
+        }
+
+        if (isChargingBow)
+        {
+            isChargingBow = false;
+        }
+
+        // Note: Dashing is handled via a Coroutine and duration in FixedUpdate, 
+        // but if you wanted to instantly stop a dash on damage, you could set isDashing = false here too.
     }
 }

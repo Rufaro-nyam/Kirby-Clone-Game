@@ -45,9 +45,8 @@ public class PlayerHealth : MonoBehaviour
         // --- LOSE ABILITY LOGIC ---
         if (kirbyController != null && kirbyController.currentEquippedAbility != CopyAbility.None)
         {
-            kirbyController.currentEquippedAbility = CopyAbility.None;
-            kirbyController.abilityUIText.text = "None";
-            kirbyController.abilityUISprite.sprite = kirbyController.noneIMG;
+            // Call the new method to handle everything!
+            kirbyController.LoseAbility();
             Debug.Log("Kirby took damage and lost his ability!");
         }
 
@@ -82,9 +81,7 @@ public class PlayerHealth : MonoBehaviour
         // Reset ability on death too, just in case
         if (kirbyController != null)
         {
-            kirbyController.currentEquippedAbility = CopyAbility.None;
-            kirbyController.abilityUIText.text = "None";
-            kirbyController.abilityUISprite.sprite = kirbyController.noneIMG;
+            kirbyController.LoseAbility();
         }
 
         // 3. Teleport to Checkpoint (or initial spawn position if no checkpoint hit yet)
