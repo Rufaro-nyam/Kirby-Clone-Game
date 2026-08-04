@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 9a904fda878227b45935489fae9c2d87
+guid: eb96cfd52a0748a428a630de3b45bb50
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6601261163861860153
-    second: platform cloud_0
+      213: 8394099260724111670
+    second: M5SI9B_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,18 +46,18 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 150
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
-  alphaIsTransparency: 1
+  alphaIsTransparency: 0
   spriteTessellationDetail: -1
-  textureType: 8
+  textureType: 0
   textureShape: 1
   singleChannelComponent: 0
   flipbookRows: 1
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: platform cloud_0
+      name: M5SI9B_0
       rect:
         serializedVersion: 2
-        x: 125
-        y: 44
-        width: 290
-        height: 92
+        x: 0
+        y: 0
+        width: 1800
+        height: 1200
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 93f5195bd046c9b50800000000000000
-      internalID: 6601261163861860153
+      spriteID: 63964d4cdc4dd7470800000000000000
+      internalID: 8394099260724111670
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      platform cloud_0: 6601261163861860153
+      M5SI9B_0: 8394099260724111670
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
