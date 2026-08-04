@@ -12425,13 +12425,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2915994521636495923, guid: 2f487502550047148b795b7c034c2fbe, type: 3}
+      propertyPath: walkSpeed
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 4595085468918082341, guid: 2f487502550047148b795b7c034c2fbe, type: 3}
       propertyPath: orthographic size
       value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 4720251477811178380, guid: 2f487502550047148b795b7c034c2fbe, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5519727814320339174, guid: 2f487502550047148b795b7c034c2fbe, type: 3}
       propertyPath: m_AnchorMax.y
